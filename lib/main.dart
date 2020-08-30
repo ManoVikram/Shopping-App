@@ -21,7 +21,7 @@ class MyApp extends StatelessWidget {
       ),
       home: ShoppingApp(),
       routes: {
-        ProductDetails.routeName: 
+        ProductDetails.routeName: (contxt) => ProductDetails(),
       },
     );
   }
