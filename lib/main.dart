@@ -1,28 +1,40 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import './screens/productsOverviewScreen.dart';
 import './screens/productDetailsScreen.dart';
+import './providers/productsProvider.dart';
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "Shopping App",
-      theme: ThemeData(
-        primarySwatch: Colors.red,
-        accentColor: Colors.amber,
-        fontFamily: "Cinzel Decorative",
-        textTheme: ThemeData.light().textTheme.copyWith(
-              bodyText1: TextStyle(
-                fontFamily: "Cantarell",
-                fontSize: 22,
+    return ChangeNotifierProvider(
+      // Provider
+
+      // A class needs to be provided above the classes that uses the data in the providers to access the data.
+      // Here 'MyApp' is above 'ProductsOverview' and 'ProductDetails'
+      // So, 'ChangeNotifierProvider' is specified here.
+
+      // Only the listening widgets will be rebuilt.
+      create: (contxt) => ProductsProvider(), // One instance for all
+      child: MaterialApp(
+        title: "Shopping App",
+        theme: ThemeData(
+          primarySwatch: Colors.red,
+          accentColor: Colors.amber,
+          fontFamily: "Cinzel Decorative",
+          textTheme: ThemeData.light().textTheme.copyWith(
+                bodyText1: TextStyle(
+                  fontFamily: "Cantarell",
+                  fontSize: 22,
+                ),
               ),
-            ),
+        ),
+        home: ShoppingApp(),
+        routes: {
+          ProductDetails.routeName: (contxt) => ProductDetails(),
+        },
       ),
-      home: ShoppingApp(),
-      routes: {
-        ProductDetails.routeName: (contxt) => ProductDetails(),
-      },
     );
   }
 }

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../screens/productDetailsScreen.dart';
+import '../models/products.dart';
 
 class ProductItem extends StatelessWidget {
   final String id;
@@ -11,6 +13,7 @@ class ProductItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final product = Provider.of<Product>(context);
     return ClipRRect(
       // Used to clip Widgets that can't be clipped(like 'GridTile')
       borderRadius: BorderRadius.circular(10),
@@ -28,11 +31,13 @@ class ProductItem extends StatelessWidget {
             // Named route
             Navigator.of(context).pushNamed(
               ProductDetails.routeName,
-              arguments: id,
+              arguments: product.id,
+              // arguments: id,
             );
           },
           child: Image.network(
-            imageURL,
+            // imageURL,
+            product.imageURL,
             fit: BoxFit.fitHeight,
             width: double.infinity,
           ),
@@ -51,16 +56,17 @@ class ProductItem extends StatelessWidget {
         footer: GridTileBar(
           backgroundColor: Colors.black54,
           title: Text(
-            title,
+            // title,
+            product.title,
             style: TextStyle(
               color: Colors.white,
             ),
           ),
           leading: IconButton(
             icon: Icon(
-              Icons.favorite,
+              product.isFavourite ? Icons.favorite_border : Icons.favorite,
             ),
-            onPressed: () {},
+            onPressed: product.toggleFavourite,
           ),
           trailing: IconButton(
             icon: Icon(Icons.shopping_cart),
