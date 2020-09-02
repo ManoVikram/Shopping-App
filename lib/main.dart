@@ -17,6 +17,7 @@ class MyApp extends StatelessWidget {
 
       // Only the listening widgets will be rebuilt.
       create: (contxt) => ProductsProvider(), // One instance for all
+      // 'ChangeNotifierProvider.value()' isn't efficient when instantiating a Widget/Class - might cause bugs
       child: MaterialApp(
         title: "Shopping App",
         theme: ThemeData(

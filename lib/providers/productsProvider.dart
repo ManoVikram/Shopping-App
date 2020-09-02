@@ -40,22 +40,40 @@ class ProductsProvider
       price: 69999,
     ),
   ];
+  /* var _showFavouritesOnly = false;
+
+  void showFavouritesOnly() {
+    _showFavouritesOnly = true;
+    notifyListeners();
+  }
+
+  void showAll() {
+    _showFavouritesOnly = false;
+    notifyListeners();
+  } */
 
   List<Product> get items {
+    /*  if (_showFavouritesOnly) {
+      return _items.where((productData) => productData.isFavourite).toList();
+    } */
     // '[..._items]' - returns the copy of the '_items' list
     // 'return _items' - returns the reference(pointer to the object in memory) to the '_items' list,
     // which makes it accessible outside the class, gives direct access to '_items'
     return [..._items];
   }
 
+  List<Product> get favouriteItems {
+    return _items.where((productItem) => productItem.isFavourite).toList();
+  }
+
   Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  void addProduct() {
+  /* void addProduct() {
     // _items.add(value);
     notifyListeners(); // used by 'Providers' package and
     // creates a link between this class and the widgets that are interested in this class and
     // listening to changes in this class.
-  }
+  } */
 }
