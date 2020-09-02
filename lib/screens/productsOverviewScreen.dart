@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../widgets/productsGrid.dart';
+import '../widgets/badge.dart';
 import '../providers/productsProvider.dart';
+import '../models/cart.dart';
 
 enum PopupMenuIndex {
   WishList,
@@ -56,6 +58,24 @@ class _ProductsOverviewState extends State<ProductsOverview> {
                 }
               });
             },
+          ),
+          Consumer<Cart>(
+            // 'Provider.of<Cart>(context)' makes the entire build method to run as it needs to be defined before 'return'
+            // 'Consumer<Cart>()' rebuilds only the required data
+            builder: (contxt, cart, childArg) {
+              return Badge(
+                value: cart.numberOfCartItems.toString(),
+                child: childArg, // Data in 'childArg' will not be re-buit
+                color: null,
+              );
+            },
+            // 'child' argument of 'Consumer<>()' will not be re-built
+            child: IconButton(
+              icon: Icon(
+                Icons.shopping_cart,
+              ),
+              onPressed: () {},
+            ),
           ),
         ],
       ),

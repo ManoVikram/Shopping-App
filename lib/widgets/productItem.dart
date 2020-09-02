@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../screens/productDetailsScreen.dart';
 import '../models/products.dart';
+import '../models/cart.dart';
 
 class ProductItem extends StatelessWidget {
   final String id;
@@ -18,7 +19,11 @@ class ProductItem extends StatelessWidget {
 
     /* Reference: https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple */
 
+    final cart = Provider.of<Cart>(context, listen: false);
+
     return Consumer<Product>(
+      // Consumer only rebuilds the widgets that are part of its builder,
+      // Provider.of() on the other hand triggers a complete re-build (i.e. re-runs build()) of this widget's widget tree.
       builder: (contxt, product, child) => ClipRRect(
         // Used to clip Widgets that can't be clipped(like 'GridTile')
         borderRadius: BorderRadius.circular(10),
@@ -78,7 +83,9 @@ class ProductItem extends StatelessWidget {
             ),
             trailing: IconButton(
               icon: Icon(Icons.shopping_cart),
-              onPressed: () {},
+              onPressed: () {
+                cart.addCartItem(product.id, product.title, product.price);
+              },
             ),
           ),
         ),

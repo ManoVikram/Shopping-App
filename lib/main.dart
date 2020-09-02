@@ -4,20 +4,30 @@ import 'package:provider/provider.dart';
 import './screens/productsOverviewScreen.dart';
 import './screens/productDetailsScreen.dart';
 import './providers/productsProvider.dart';
+import './models/cart.dart';
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      // Provider
+    return MultiProvider(
+      // 'MultiProvider()' is used for handling multiple 'ChangeNotifierProvider()'
+      // ChangeNotifierProvider(create: () {}, child: ChangeNotifierProvider(create: () {}, child: ...,),), => Can also be used, but might look ugly.
+      providers: [
+        ChangeNotifierProvider(
+          // Provider
 
-      // A class needs to be provided above the classes that uses the data in the providers to access the data.
-      // Here 'MyApp' is above 'ProductsOverview' and 'ProductDetails'
-      // So, 'ChangeNotifierProvider' is specified here.
+          // A class needs to be provided above the classes that uses the data in the providers to access the data.
+          // Here 'MyApp' is above 'ProductsOverview' and 'ProductDetails'
+          // So, 'ChangeNotifierProvider' is specified here.
 
-      // Only the listening widgets will be rebuilt.
-      create: (contxt) => ProductsProvider(), // One instance for all
-      // 'ChangeNotifierProvider.value()' isn't efficient when instantiating a Widget/Class - might cause bugs
+          // Only the listening widgets will be rebuilt.
+          create: (contxt) => ProductsProvider(),
+        ), // One instance for all
+        // 'ChangeNotifierProvider.value()' isn't efficient when instantiating a Widget/Class - might cause bugs
+        ChangeNotifierProvider(
+          create: (contxt) => Cart(),
+        ),
+      ],
       child: MaterialApp(
         title: "Shopping App",
         theme: ThemeData(
