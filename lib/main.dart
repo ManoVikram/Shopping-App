@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shoppingApp/models/orders.dart';
 
 import './screens/productsOverviewScreen.dart';
 import './screens/productDetailsScreen.dart';
+import './screens/cartScreen.dart';
 import './providers/productsProvider.dart';
 import './models/cart.dart';
 
@@ -27,23 +29,28 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (contxt) => Cart(),
         ),
+        ChangeNotifierProvider(
+          create: (contxt) => Orders(),
+        ),
       ],
       child: MaterialApp(
         title: "Shopping App",
         theme: ThemeData(
-          primarySwatch: Colors.red,
+          primarySwatch: Colors.green,
           accentColor: Colors.amber,
           fontFamily: "Cinzel Decorative",
           textTheme: ThemeData.light().textTheme.copyWith(
                 bodyText1: TextStyle(
                   fontFamily: "Cantarell",
                   fontSize: 22,
+                  color: Colors.white,
                 ),
               ),
         ),
         home: ShoppingApp(),
         routes: {
           ProductDetails.routeName: (contxt) => ProductDetails(),
+          CartScreen.routeName: (contxt) => CartScreen(),
         },
       ),
     );

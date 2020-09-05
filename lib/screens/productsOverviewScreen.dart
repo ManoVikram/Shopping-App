@@ -5,6 +5,7 @@ import '../widgets/productsGrid.dart';
 import '../widgets/badge.dart';
 import '../providers/productsProvider.dart';
 import '../models/cart.dart';
+import '../screens/cartScreen.dart';
 
 enum PopupMenuIndex {
   WishList,
@@ -74,7 +75,9 @@ class _ProductsOverviewState extends State<ProductsOverview> {
               icon: Icon(
                 Icons.shopping_cart,
               ),
-              onPressed: () {},
+              onPressed: () {
+                Navigator.of(context).pushNamed(CartScreen.routeName);
+              },
             ),
           ),
         ],

@@ -4,13 +4,13 @@ class CartItem {
   final String id;
   final String title;
   final double price;
-  final int quaintity;
+  final int quantity;
 
   CartItem({
     @required this.id, // Different from the 'id' of the Product
     @required this.title,
     @required this.price,
-    @required this.quaintity,
+    @required this.quantity,
   });
 }
 
@@ -24,9 +24,17 @@ class Cart with ChangeNotifier {
   int get numberOfCartItems {
     int val = 0;
     items.forEach((key, value) {
-      val += value.quaintity;
+      val += value.quantity;
     });
     return val;
+  }
+
+  double get totalCost {
+    double cost = 0;
+    _items.forEach((key, value) {
+      cost += value.price * value.quantity;
+    });
+    return cost;
   }
 
   void addCartItem(String productId, String title, double price) {
@@ -37,7 +45,7 @@ class Cart with ChangeNotifier {
           id: productIdItem.id,
           title: productIdItem.title,
           price: productIdItem.price,
-          quaintity: productIdItem.quaintity + 1,
+          quantity: productIdItem.quantity + 1,
         ),
       );
     } else {
@@ -47,10 +55,33 @@ class Cart with ChangeNotifier {
           id: DateTime.now().toString(),
           title: title,
           price: price,
-          quaintity: 1,
+          quantity: 1,
         ),
       );
     }
+    notifyListeners();
+  }
+
+  void removeCartItem(String productIdKey) {
+    _items.remove(productIdKey);
+    notifyListeners();
+  }
+
+  void reduceQuantity(String productIdKey) {
+    _items.update(
+      productIdKey,
+      (value) => CartItem(
+        id: value.id,
+        title: value.title,
+        price: value.price,
+        quantity: value.quantity - 1 <= 1 ? 1 : value.quantity - 1,
+      ),
+    );
+    notifyListeners();
+  }
+
+  void clearCart() {
+    _items = {};
     notifyListeners();
   }
 }
