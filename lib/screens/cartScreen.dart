@@ -53,7 +53,7 @@ class CartScreen extends StatelessWidget {
                     // 'Chip()' -> In-built widget
                     label: Text(
                       // cart.totalCost.toString(),
-                      "₹${cart.totalCost}",
+                      "₹${cart.totalCost.toStringAsFixed(2)}",
                       style: TextStyle(
                         // fontStyle: FontStyle.italic,
                         fontSize: 20,
