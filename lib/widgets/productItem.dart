@@ -82,9 +82,27 @@ class ProductItem extends StatelessWidget {
               onPressed: product.toggleFavourite,
             ),
             trailing: IconButton(
-              icon: Icon(Icons.shopping_cart),
+              icon: Icon(Icons.add_shopping_cart),
               onPressed: () {
                 cart.addCartItem(product.id, product.title, product.price);
+                Scaffold.of(context).hideCurrentSnackBar();
+                Scaffold.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      "Item added to the cart!",
+                      // textAlign: TextAlign.center,
+                    ),
+                    duration: Duration(
+                      seconds: 2,
+                    ),
+                    action: SnackBarAction(
+                      label: "UNDO",
+                      onPressed: () {
+                        cart.reduceQuantity(product.id);
+                      },
+                    ),
+                  ),
+                );
               },
             ),
           ),

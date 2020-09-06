@@ -80,22 +80,91 @@ class CartItem extends StatelessWidget {
             ),
             title: Text(title),
             subtitle: Text("Total: ${(quantity * price)}"),
-            trailing: Text("X $quantity"),
+            trailing: Text("x $quantity"),
           ),
         ),
       ),
       confirmDismiss: (direction) async {
         bool decision = false;
         if (direction == DismissDirection.startToEnd) {
-          decision = true;
+          // decision = true;
+          return showDialog(
+            context: context,
+            builder: (contxt) => AlertDialog(
+              title: Text(
+                "Are you sure?",
+              ),
+              content: Text(
+                "Do you want to remove the item?",
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    decision = true;
+                    Navigator.of(context).pop(decision);
+                  },
+                  child: Text(
+                    "Yes",
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    decision = false;
+                    Navigator.of(context).pop(decision);
+                  },
+                  child: Text(
+                    "No",
+                  ),
+                ),
+              ],
+            ),
+          );
         } else if (direction == DismissDirection.endToStart) {
           // TODO: Decrease the quantity of the product(function call - function in cart.dart)
-          Provider.of<Cart>(context, listen: false).reduceQuantity(productId);
-          Scaffold.of(context).showSnackBar(
-              SnackBar(content: Text("$title quantity decreased")));
-          decision = false;
+          return showDialog(
+            context: context,
+            builder: (contxt) => AlertDialog(
+              title: Text(
+                "Are you sure?",
+              ),
+              content: Text(
+                "Do you want to reduce the quantity of the item?",
+              ),
+              actions: [
+                FlatButton(
+                  onPressed: () {
+                    decision = false;
+                    Navigator.of(context).pop(decision);
+                    Provider.of<Cart>(context, listen: false)
+                        .reduceQuantity(productId);
+                    Scaffold.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          "$title quantity decreased",
+                        ),
+                      ),
+                    );
+                  },
+                  child: Text(
+                    "Yes",
+                  ),
+                ),
+                FlatButton(
+                  onPressed: () {
+                    decision = false;
+                    Navigator.of(context).pop(decision);
+                  },
+                  child: Text(
+                    "No",
+                  ),
+                ),
+              ],
+            ),
+          );
+          // decision = false;
         }
-        return decision;
+        // return Future.value(decision);
+        // return decision;
       },
       onDismissed: (direction) {
         if (direction == DismissDirection.startToEnd) {
