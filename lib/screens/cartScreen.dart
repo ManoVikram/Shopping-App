@@ -19,7 +19,7 @@ class CartScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          "Your Cart",
+          "My Cart",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 2,

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import './addEditUserProducts.dart';
 import '../providers/productsProvider.dart';
 import '../widgets/appDrawer.dart';
 import '../widgets/userProductsItem.dart';
@@ -13,7 +14,7 @@ class UserProductsScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Your Cart",
+          "My Products",
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 2,
@@ -22,7 +23,11 @@ class UserProductsScreen extends StatelessWidget {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.of(context).pushNamed(
+                AddEditUserProductsScreen.routeName,
+              );
+            },
           ),
         ],
       ),

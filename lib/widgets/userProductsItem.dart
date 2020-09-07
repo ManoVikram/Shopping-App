@@ -10,6 +10,7 @@ class UserProductsItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: CircleAvatar(
+        radius: 25,
         backgroundImage: NetworkImage(
           imageURL,
         ),
@@ -23,13 +24,14 @@ class UserProductsItem extends StatelessWidget {
         ),
       ),
       trailing: Container(
-        width: 150,
+        width: 100,
         child: Row(
           children: [
             IconButton(
               icon: Icon(
                 Icons.edit,
-                color: Theme.of(context).primaryColor,
+                // color: Theme.of(context).primaryColor,
+                color: Colors.blue,
               ),
               onPressed: () {},
             ),
