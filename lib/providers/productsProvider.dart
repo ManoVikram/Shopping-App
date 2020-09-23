@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/products.dart';
 
@@ -70,10 +73,140 @@ class ProductsProvider
     return _items.firstWhere((product) => product.id == id);
   }
 
-  /* void addProduct() {
-    // _items.add(value);
-    notifyListeners(); // used by 'Providers' package and
-    // creates a link between this class and the widgets that are interested in this class and
-    // listening to changes in this class.
+  // ===== METHOD-1 =====
+  /* Future<void> addProduct(Product product) {
+    /* return type is made 'Future<void>', so that 'addProduct().then(() {})'
+    can be used to have a loading indicator or wait on the form page till the
+    data is added and response is received from the server. */
+    const url = "https://shopping-app-f0bc8.firebaseio.com/products.json";
+    // 'https://project-name.firebaseio.com/folder-name.json'
+    // - '/folder-name.json' is just a Firebase requirement(mandatory), not for others.
+    return http
+        .post(
+      url,
+      body: json.encode(
+        {
+          "title": product.title,
+          "description": product.description,
+          "imageURL": product.imageURL,
+          "price": product.price,
+          "isFavourite": product.isFavourite,
+        },
+      ),
+      // 'body: ' contains JSON data, use "import 'dart:convert';"
+    )
+        .then(
+      // The code within will be executed only when the response is received from the backend/server or
+      // all the 'asynchronous' (statements after, outside .then()/Future block).
+      // '.then()' returns 'Future' => .then(() {}).then(() {}) is possible
+      (response) {
+        print(json.decode(
+            response.body)["name"]); // unique id provided by the backend
+        Product newProduct = Product(
+          id: json.decode(response.body)["name"],
+          title: product.title,
+          description: product.description,
+          imageURL: product.imageURL,
+          price: product.price,
+        );
+
+        _items.add(newProduct);
+        /* _items.insert(0, newProduct); // Adds the product to the top of the list */
+
+        notifyListeners(); // used by 'Providers' package and
+        // creates a link between this class and the widgets that are interested in this class and
+        // listening to changes in this class.
+      },
+    ).catchError(
+      (error) {
+        print(error);
+        throw error;
+      },
+    );
+    // .then(() {}).catchError((error) {}) => '.catchError((error) {})' catches all the errors in the
+    // Future and/or .then() before it.
+    // '.catchError((error) {})' also returns 'Future'
+    // .then(() {}).catchError((error) {}).then(() {}) is also possible.
+
+    // return Future.value();
+    // returns 'Future' with no value
+    // Also, it is executed as it is 'asynchronous'.
+    // 'Future' executes all the 'asynchronous' statements immediately.
   } */
+
+  // ===== METHOD-2 =====
+  Future<void> addProduct(Product product) async {
+    // 'async' function always returns a 'Future'
+
+    /* return type is made 'Future<void>', so that 'addProduct().then(() {})'
+    can be used to have a loading indicator or wait on the form page till the
+    data is added and response is received from the server. */
+    const url = "https://shopping-app-f0bc8.firebaseio.com/products.json";
+    // 'https://project-name.firebaseio.com/folder-name.json'
+    // - '/folder-name.json' is just a Firebase requirement(mandatory), not for others.
+
+    try {
+      // 'await' tells Dart to wait till the current operation finish, before moving on to the next line/operation
+      final response = await http.post(
+        url,
+        body: json.encode(
+          {
+            "title": product.title,
+            "description": product.description,
+            "imageURL": product.imageURL,
+            "price": product.price,
+            "isFavourite": product.isFavourite,
+          },
+        ),
+        // 'body: ' contains JSON data, use "import 'dart:convert';"
+      );
+      print(json
+          .decode(response.body)["name"]); // unique id provided by the backend
+      final Product newProduct = Product(
+        id: json.decode(response.body)["name"],
+        title: product.title,
+        description: product.description,
+        imageURL: product.imageURL,
+        price: product.price,
+      );
+
+      _items.add(newProduct);
+      /* _items.insert(0, newProduct); // Adds the product to the top of the list */
+
+      notifyListeners(); // used by 'Providers' package and
+      // creates a link between this class and the widgets that are interested in this class and
+      // listening to changes in this class.
+    } catch (error) {
+      print(error);
+      throw error;
+    }
+
+    // The code within will be executed only when the response is received from the backend/server or
+    // all the 'asynchronous' (statements after, outside .then()/Future block).
+    // '.then()' returns 'Future' => .then(() {}).then(() {}) is possible
+
+    // .then(() {}).catchError((error) {}) => '.catchError((error) {})' catches all the errors in the
+    // Future and/or .then() before it.
+    // '.catchError((error) {})' also returns 'Future'
+    // .then(() {}).catchError((error) {}).then(() {}) is also possible.
+
+    // return Future.value();
+    // returns 'Future' with no value
+    // Also, it is executed as it is 'asynchronous'.
+    // 'Future' executes all the 'asynchronous' statements immediately.
+  }
+
+  void updateProduct(String productId, Product updatedProduct) {
+    final productIndex =
+        _items.indexWhere((element) => element.id == productId);
+    if (productIndex >= 0) {
+      _items[productIndex] = updatedProduct;
+    }
+    notifyListeners();
+  }
+
+  void removeProduct(String id) {
+    _items.removeWhere((product) => product.id == id);
+    notifyListeners();
+  }
 }
