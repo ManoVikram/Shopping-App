@@ -66,26 +66,7 @@ class CartScreen extends StatelessWidget {
                   /*  SizedBox(
                     width: 10,
                   ), */
-                  FlatButton(
-                    child: Text(
-                      "Place Order",
-                      style: TextStyle(
-                        fontFamily:
-                            Theme.of(context).textTheme.bodyText1.toString(),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        // color: Colors.purple,
-                        color: Theme.of(context).primaryColor,
-                      ),
-                    ),
-                    onPressed: () {
-                      Provider.of<Orders>(context, listen: false).addOrder(
-                        cart.items.values.toList(),
-                        cart.totalCost,
-                      );
-                      cart.clearCart();
-                    },
-                  ),
+                  PlaceOrderButton(cart: cart),
                 ],
               ),
             ),
@@ -110,6 +91,61 @@ class CartScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class PlaceOrderButton extends StatefulWidget {
+  // 'setState()' is used inside the 'FlatButton'
+  // 'setState()' rebuilds the 'build' method
+  // To reduce the number of lines that gets rebuilt,
+  // 'FlatButton()' is extracted to a separate widget.
+  const PlaceOrderButton({
+    Key key,
+    @required this.cart,
+  }) : super(key: key);
+
+  final Cart cart;
+
+  @override
+  _PlaceOrderButtonState createState() => _PlaceOrderButtonState();
+}
+
+class _PlaceOrderButtonState extends State<PlaceOrderButton> {
+  bool _isLoading = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return FlatButton(
+      child: _isLoading
+          ? CircularProgressIndicator()
+          : Text(
+              "Place Order",
+              style: TextStyle(
+                fontFamily: Theme.of(context).textTheme.bodyText1.toString(),
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                // color: Colors.purple,
+                color: Theme.of(context).primaryColor,
+              ),
+            ),
+      onPressed: (widget.cart.totalCost <= 0 || _isLoading)
+          ? null
+          : () async {
+              setState(() {
+                _isLoading = true;
+              });
+
+              await Provider.of<Orders>(context, listen: false).addOrder(
+                widget.cart.items.values.toList(),
+                widget.cart.totalCost,
+              );
+
+              setState(() {
+                _isLoading = false;
+              });
+              widget.cart.clearCart();
+            },
     );
   }
 }

@@ -4,13 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/products.dart';
+import '../models/httpException.dart';
 
 class ProductsProvider
     with
         ChangeNotifier /* 'with ClassName' - Mixins - merge some properties to the existing class(like inheritance) */ {
   // 'ChangeNotifier' - More like 'inherited' widget
   List<Product> _items = [
-    Product(
+    /* Product(
       id: "P1",
       title: "Adidas Shoes",
       description: "The best comfy shoes on the planet.",
@@ -41,7 +42,7 @@ class ProductsProvider
       imageURL:
           "https://5.imimg.com/data5/XI/KO/MY-16701245/apple-macbook-air-mqd32hn-a-13-3-inch-laptop-2017-core-i5-8-500x500.jpg",
       price: 69999,
-    ),
+    ), */
   ];
   /* var _showFavouritesOnly = false;
 
@@ -71,6 +72,40 @@ class ProductsProvider
 
   Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
+  }
+
+  Future<void> fetchProducts() async {
+    const url = "https://shopping-app-f0bc8.firebaseio.com/products.json";
+    try {
+      final response = await http.get(url);
+      // print(json.decode(response.body));
+      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      // Dart couldn't understand that the value is a 'Map'/'Object'. So, 'dynamic' is used.
+
+      if (extractedData == null) {
+        return;
+      }
+
+      final List<Product> loadedItems = [];
+      extractedData.forEach(
+        (productIdKey, productDataValue) {
+          loadedItems.add(
+            Product(
+              id: productIdKey,
+              title: productDataValue["title"],
+              description: productDataValue["description"],
+              imageURL: productDataValue["imageURL"],
+              price: productDataValue["price"],
+              isFavourite: productDataValue["isFavourite"],
+            ),
+          );
+        },
+      );
+      _items = loadedItems;
+      notifyListeners();
+    } catch (error) {
+      throw error;
+    }
   }
 
   // ===== METHOD-1 =====
@@ -196,17 +231,82 @@ class ProductsProvider
     // 'Future' executes all the 'asynchronous' statements immediately.
   }
 
-  void updateProduct(String productId, Product updatedProduct) {
+  Future<void> updateProduct(String productId, Product updatedProduct) async {
     final productIndex =
         _items.indexWhere((element) => element.id == productId);
     if (productIndex >= 0) {
+      final url =
+          "https://shopping-app-f0bc8.firebaseio.com/products/$productId.json";
+      // All 'http' requests should be present inside 'async' method with return type as 'Future'
+      await http.patch(
+        url,
+        body: json.encode(
+          {
+            "title": updatedProduct.title,
+            "description": updatedProduct.description,
+            "imageURL": updatedProduct.imageURL,
+            "price": updatedProduct.price,
+            // Firebase won't erase 'isFavourite' as it is not updated/erased.
+            // 'isFavourite' value will remain the same.
+            // It will automatically add new keys(if any)
+            // Else, values of current keys will be updated on the Firebase.
+          },
+        ),
+      );
       _items[productIndex] = updatedProduct;
     }
     notifyListeners();
   }
 
-  void removeProduct(String id) {
-    _items.removeWhere((product) => product.id == id);
+  /* void removeProduct(String id) {
+    final url = "https://shopping-app-f0bc8.firebaseio.com/products/$id.json";
+    final currentProductIndex =
+        _items.indexWhere((product) => product.id == id);
+    var currentProduct = _items[currentProductIndex];
+
+    _items.removeAt(currentProductIndex);
     notifyListeners();
+    http.delete(url).then(
+      // '.delete()' doesn't throw an error even if an error status code is thrown from the server.
+      (response) {
+        print(response.statusCode);
+        if (response.statusCode >= 400) {
+          // throw Exception(); - Discouraged by the Dart team. Use own exceptions.
+          throw HttpException("Error occurred!! Couldn't delete product.");
+        }
+        currentProduct = null;
+      },
+    ).catchError(
+      (_) {
+        _items.insert(currentProductIndex, currentProduct);
+        notifyListeners();
+      },
+    );
+    // _items.removeWhere((product) => product.id == id);
+  } */
+
+  Future<void> removeProduct(String id) async {
+    final url = "https://shopping-app-f0bc8.firebaseio.com/products/$id.json";
+    final currentProductIndex =
+        _items.indexWhere((product) => product.id == id);
+    var currentProduct = _items[currentProductIndex];
+
+    _items.removeAt(currentProductIndex);
+    notifyListeners();
+
+    final response = await http.delete(url);
+
+    // '.delete()' doesn't throw an error even if an error status code is thrown from the server.
+    print(response.statusCode);
+    if (response.statusCode >= 400) {
+      _items.insert(currentProductIndex, currentProduct);
+      notifyListeners();
+      // throw Exception(); - Discouraged by the Dart team. Use own exceptions.
+      // 'throw' is like 'return'. It cancels the rest of the code execution.
+      throw HttpException("Error occurred!! Couldn't delete product.");
+    }
+    currentProduct = null;
+
+    // _items.removeWhere((product) => product.id == id);
   }
 }

@@ -8,6 +8,13 @@ import '../widgets/userProductsItem.dart';
 
 class UserProductsScreen extends StatelessWidget {
   static const routeName = "/userProducts";
+
+  Future<void> _refreshProducts(BuildContext context) async {
+    // Since, the function is outside the 'build' method, 'context' isn't available.
+    // So, 'context' needs to be passed as an argument.
+    await Provider.of<ProductsProvider>(context, listen: false).fetchProducts();
+  }
+
   @override
   Widget build(BuildContext context) {
     final productsData = Provider.of<ProductsProvider>(context);
@@ -32,22 +39,25 @@ class UserProductsScreen extends StatelessWidget {
         ],
       ),
       drawer: AppDrawer(),
-      body: Padding(
-        padding: const EdgeInsets.all(10.0),
-        child: ListView.builder(
-          itemBuilder: (contxt, index) {
-            return Column(
-              children: [
-                UserProductsItem(
-                  productsData.items[index].id,
-                  productsData.items[index].title,
-                  productsData.items[index].imageURL,
-                ),
-                Divider(),
-              ],
-            );
-          },
-          itemCount: productsData.items.length,
+      body: RefreshIndicator(
+        onRefresh: () => _refreshProducts(context),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
+          child: ListView.builder(
+            itemBuilder: (contxt, index) {
+              return Column(
+                children: [
+                  UserProductsItem(
+                    productsData.items[index].id,
+                    productsData.items[index].title,
+                    productsData.items[index].imageURL,
+                  ),
+                  Divider(),
+                ],
+              );
+            },
+            itemCount: productsData.items.length,
+          ),
         ),
       ),
     );

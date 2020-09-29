@@ -13,6 +13,7 @@ class UserProductsItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final scaffold = Scaffold.of(context);
     return ListTile(
       leading: CircleAvatar(
         radius: 25,
@@ -50,9 +51,28 @@ class UserProductsItem extends StatelessWidget {
                 Icons.delete,
                 color: Theme.of(context).errorColor,
               ),
-              onPressed: () {
-                Provider.of<ProductsProvider>(context, listen: false)
-                    .removeProduct(id);
+              onPressed: () async {
+                try {
+                  await Provider.of<ProductsProvider>(context, listen: false)
+                      .removeProduct(id);
+                } catch (error) {
+                  // 'Scaffold.of(context)' cannot be used.
+                  // Because, Flutter doesn't know whether context points to the required object or not,
+                  // as 'async', 'await' is used, which returns 'Future'.
+                  /* Scaffold.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text("Delete product failed!!"),
+                    ),
+                  ); */
+                  scaffold.showSnackBar(
+                    SnackBar(
+                      content: Text(
+                        "Delete product failed!!",
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                  );
+                }
               },
             ),
           ],

@@ -20,6 +20,47 @@ class ProductsOverview extends StatefulWidget {
 
 class _ProductsOverviewState extends State<ProductsOverview> {
   bool _showFavourites = false;
+  bool _isInit = true;
+  bool _isLoading = false;
+
+  @override
+  void initState() {
+    // Provider.of<ProductsProvider>(context).fetchProducts(); => Will not work as 'context' is not available | Will work if 'listen: false' is set.
+    // 'context' is not available because, 'initState()' runs before everything in the class, while contents aren't properly initialized/wired-up.
+
+    // ----- Below method will work(it's a kinda hack) -----
+    /* Future.delayed(Duration.zero).then(
+      (value) {
+        Provider.of<ProductsProvider>(context).fetchProducts();
+      },
+    ); */
+    // Other method, by using didChangeDependencies()'
+    super.initState();
+  }
+
+  @override
+  void didChangeDependencies() {
+    // Unlike 'initState()', 'didChangeDependencies()' runs multiple times.
+    // Runs before 'build'.
+
+    // 'async', 'await' cannot be used as 'didChangeDependencies()' is an in-built,
+    // overrided function. So, the return type can't be changed to 'Future' as 'async' returns 'Future'
+    // Thus, '.then()' is used.
+    if (_isInit) {
+      setState(() {
+        _isLoading = true;
+      });
+      Provider.of<ProductsProvider>(context).fetchProducts().then(
+        (value) {
+          setState(() {
+            _isLoading = false;
+          });
+        },
+      );
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,7 +125,11 @@ class _ProductsOverviewState extends State<ProductsOverview> {
         ],
       ),
       drawer: AppDrawer(),
-      body: ProductsGrid(_showFavourites),
+      body: _isLoading
+          ? Center(
+              child: CircularProgressIndicator(),
+            )
+          : ProductsGrid(_showFavourites),
     );
   }
 }

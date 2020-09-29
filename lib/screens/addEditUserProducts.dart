@@ -184,18 +184,18 @@ class _AddEditUserProductsScreenState extends State<AddEditUserProductsScreen> {
       if (_editProduct.id != null) {
         // Newly added products don't have 'id'
         // Products that are already present in the list have 'id'
-        Provider.of<ProductsProvider>(context, listen: false)
+        await Provider.of<ProductsProvider>(context, listen: false)
             .updateProduct(_editProduct.id, _editProduct);
         // When a product gets updated, it is dropped from the 'favourites'
         // Because, 'isFavourite' is 'false' by default
         /* This happens because the app is tricked as if the old product is updated,
         but, acutally, a new product is created and placed at the place of an old product.
         with updated values */
-        setState(() {
+        /* setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-        // Page is popped immediately after the product is updated.
+        // Page is popped immediately after the product is updated. */
       } else {
         try {
           await Provider.of<ProductsProvider>(context, listen: false)
@@ -217,17 +217,23 @@ class _AddEditUserProductsScreenState extends State<AddEditUserProductsScreen> {
               ],
             ),
           );
-        } finally {
+        }
+        /* finally {
           // 'finally' block always run even if there is an error or not.
           setState(() {
             _isLoading = false;
           });
           Navigator.of(context).pop();
           // Page is popped only after the response is received from the server.
-        }
+        } */
       }
       // Navigator.of(context).pop();
       // Leaves the screen, once the product is successfully submitted
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
+      // Page is popped immediately after the product is updated.
     }
   }
 
