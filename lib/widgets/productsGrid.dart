@@ -16,7 +16,7 @@ class ProductsGrid extends StatelessWidget {
     final products =
         showFavourites ? productData.favouriteItems : productData.items;
     // 'of()' is a generic type - so data type can be specified
-    // Tells that thid widget is listening
+    // Tells that this widget is listening
     // Sets up a direct communication channel behind the screens
     // Gets rebuilt whenever the required data changes
     return GridView.builder(

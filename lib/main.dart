@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shoppingApp/models/orders.dart';
 
 import './screens/productsOverviewScreen.dart';
 import './screens/productDetailsScreen.dart';
@@ -8,8 +7,11 @@ import './screens/cartScreen.dart';
 import './screens/ordersScreen.dart';
 import './screens/userProductsScreen.dart';
 import './screens/addEditUserProducts.dart';
+import './screens/authScreen.dart';
 import './providers/productsProvider.dart';
 import './models/cart.dart';
+import './models/orders.dart';
+import './models/auth.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -35,6 +37,9 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
           create: (contxt) => Orders(),
         ),
+        ChangeNotifierProvider(
+          create: (contxt) => Auth(),
+        ),
       ],
       child: MaterialApp(
         title: "Shopping App",
@@ -58,6 +63,7 @@ class MyApp extends StatelessWidget {
           UserProductsScreen.routeName: (context) => UserProductsScreen(),
           AddEditUserProductsScreen.routeName: (context) =>
               AddEditUserProductsScreen(),
+          AuthScreen.routeName: (contxt) => AuthScreen(),
         },
       ),
     );
@@ -78,7 +84,8 @@ class _ShoppingAppState extends State<ShoppingApp> {
           "Shopping",
         ),
       ), */
-      body: ProductsOverview(),
+      // body: ProductsOverview(),
+      body: AuthScreen(),
     );
   }
 }
