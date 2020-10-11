@@ -8,6 +8,7 @@ import './screens/ordersScreen.dart';
 import './screens/userProductsScreen.dart';
 import './screens/addEditUserProducts.dart';
 import './screens/authScreen.dart';
+import './screens/splashScreen.dart';
 import './providers/productsProvider.dart';
 import './models/cart.dart';
 import './models/orders.dart';
@@ -28,17 +29,33 @@ class MyApp extends StatelessWidget {
           // So, 'ChangeNotifierProvider' is specified here.
 
           // Only the listening widgets will be rebuilt.
-          create: (contxt) => ProductsProvider(),
+          create: (contxt) => Auth(),
         ), // One instance for all
-        // 'ChangeNotifierProvider.value()' isn't efficient when instantiating a Widget/Class - might cause bugs
+        // 'ChangeNotifierProvider.value(builder:)' isn't efficient when instantiating a Widget/Class - might cause bugs
+
+        // 'ChangeNotifierProxyProvider<>()' is used when arguments needs to be passed.
+        // 'ChangeNotifierProxyProvider<>()' allows to set up a provider which itself depends on another provider
+        // defined before it.
+        ChangeNotifierProxyProvider<Auth, ProductsProvider>(
+          update: (contxt, auth, previousProducts) => ProductsProvider(
+            auth.token,
+            auth.userId,
+            previousProducts == null ? [] : previousProducts.items,
+          ),
+          create: null,
+          // 'previousProducts' is the 3rd argument.
+          // It holds the previous state/previous product.
+        ),
         ChangeNotifierProvider(
           create: (contxt) => Cart(),
         ),
-        ChangeNotifierProvider(
-          create: (contxt) => Orders(),
-        ),
-        ChangeNotifierProvider(
-          create: (contxt) => Auth(),
+        ChangeNotifierProxyProvider<Auth, Orders>(
+          update: (contxt, auth, previousOrders) => Orders(
+            auth.token,
+            auth.userId,
+            previousOrders == null ? [] : previousOrders.orders,
+          ),
+          create: null,
         ),
       ],
       child: MaterialApp(
@@ -78,14 +95,25 @@ class ShoppingApp extends StatefulWidget {
 class _ShoppingAppState extends State<ShoppingApp> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      /* appBar: AppBar(
-        title: Text(
-          "Shopping",
-        ),
-      ), */
-      // body: ProductsOverview(),
-      body: AuthScreen(),
+    return Consumer<Auth>(
+      builder: (contxt, auth, child) => Scaffold(
+        /* appBar: AppBar(
+          title: Text(
+            "Shopping",
+          ),
+        ), */
+        // body: ProductsOverview(),
+        body: auth.isAuth
+            ? ProductsOverview()
+            : FutureBuilder(
+                future: auth.tryAutoLogIn(),
+                builder: (contxt, authResultSnapShot) =>
+                    authResultSnapShot.connectionState ==
+                            ConnectionState.waiting
+                        ? SplashScreen()
+                        : AuthScreen(),
+              ),
+      ),
     );
   }
 }

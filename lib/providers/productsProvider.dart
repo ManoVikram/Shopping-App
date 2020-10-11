@@ -55,6 +55,12 @@ class ProductsProvider
     _showFavouritesOnly = false;
     notifyListeners();
   } */
+  final String authToken;
+  final String userId;
+
+  ProductsProvider(this.authToken, this.userId, this._items);
+  // '_items' is also initialized.
+  // Because, data might get lost during the re-build.
 
   List<Product> get items {
     /*  if (_showFavouritesOnly) {
@@ -74,8 +80,27 @@ class ProductsProvider
     return _items.firstWhere((product) => product.id == id);
   }
 
-  Future<void> fetchProducts() async {
-    const url = "https://shopping-app-f0bc8.firebaseio.com/products.json";
+  Future<void> fetchProducts([bool filterByUser = false]) async {
+    // Arguments inside [] are default arguments.
+    final filterString =
+        filterByUser ? 'orderBy="productCreatorId"&equalTo="$userId"' : '';
+    print(filterByUser ? "1=" : "0=");
+    var url =
+        "https://shopping-app-f0bc8.firebaseio.com/products.json?auth=$authToken&$filterString";
+    print(url);
+    // '?auth=[TOKEN]' needs to be set to tell firebase that the user is authenticated.
+    // "orderBy='productCreatorId'&equalTo='$userId'" - Filter and return the procucts
+    // where 'productCreatorId' is equal to 'userId'
+    // 'orderBy' and 'equalTo' are Firebase specific terms.
+    /* Only 'userProductsScreen' needs filtering */
+
+    /*
+    "products": {
+      ".indexOn": ["productCreatorId"],
+    }
+    The above code needs to be added to the Firebase Realtime Database Rules
+    */
+
     try {
       final response = await http.get(url);
       // print(json.decode(response.body));
@@ -86,6 +111,11 @@ class ProductsProvider
         return;
       }
 
+      url =
+          "https://shopping-app-f0bc8.firebaseio.com/userFavourites/$userId.json?auth=$authToken";
+      final favouriteResponse = await http.get(url);
+      // Gets all the favourites of that particular user.
+      final favouriteData = json.decode(favouriteResponse.body);
       final List<Product> loadedItems = [];
       extractedData.forEach(
         (productIdKey, productDataValue) {
@@ -96,7 +126,12 @@ class ProductsProvider
               description: productDataValue["description"],
               imageURL: productDataValue["imageURL"],
               price: productDataValue["price"],
-              isFavourite: productDataValue["isFavourite"],
+              // isFavourite: productDataValue["isFavourite"],
+              isFavourite: favouriteData == null
+                  ? false
+                  : favouriteData[productIdKey] ?? false,
+              // 'favouriteData[productIdKey] ?? false' - When favouriteData[productIdKey] isn't
+              // available(== null), false is set.
             ),
           );
         },
@@ -176,7 +211,8 @@ class ProductsProvider
     /* return type is made 'Future<void>', so that 'addProduct().then(() {})'
     can be used to have a loading indicator or wait on the form page till the
     data is added and response is received from the server. */
-    const url = "https://shopping-app-f0bc8.firebaseio.com/products.json";
+    final url =
+        "https://shopping-app-f0bc8.firebaseio.com/products.json?auth=$authToken";
     // 'https://project-name.firebaseio.com/folder-name.json'
     // - '/folder-name.json' is just a Firebase requirement(mandatory), not for others.
 
@@ -190,13 +226,17 @@ class ProductsProvider
             "description": product.description,
             "imageURL": product.imageURL,
             "price": product.price,
-            "isFavourite": product.isFavourite,
+            "productCreatorId": userId,
+            // "isFavourite": product.isFavourite,
+            // Favourites data is managed separately on the server; respective to the user.
           },
         ),
         // 'body: ' contains JSON data, use "import 'dart:convert';"
       );
+      print("Hello");
       print(json
           .decode(response.body)["name"]); // unique id provided by the backend
+      print("World");
       final Product newProduct = Product(
         id: json.decode(response.body)["name"],
         title: product.title,
@@ -236,7 +276,7 @@ class ProductsProvider
         _items.indexWhere((element) => element.id == productId);
     if (productIndex >= 0) {
       final url =
-          "https://shopping-app-f0bc8.firebaseio.com/products/$productId.json";
+          "https://shopping-app-f0bc8.firebaseio.com/products/$productId.json?auth=$authToken";
       // All 'http' requests should be present inside 'async' method with return type as 'Future'
       await http.patch(
         url,
@@ -246,8 +286,8 @@ class ProductsProvider
             "description": updatedProduct.description,
             "imageURL": updatedProduct.imageURL,
             "price": updatedProduct.price,
-            // Firebase won't erase 'isFavourite' as it is not updated/erased.
-            // 'isFavourite' value will remain the same.
+            // Firebase won't erase 'productCreatorId' as it is not updated/erased.
+            // 'productCreatorId' value will remain the same.
             // It will automatically add new keys(if any)
             // Else, values of current keys will be updated on the Firebase.
           },
@@ -286,7 +326,8 @@ class ProductsProvider
   } */
 
   Future<void> removeProduct(String id) async {
-    final url = "https://shopping-app-f0bc8.firebaseio.com/products/$id.json";
+    final url =
+        "https://shopping-app-f0bc8.firebaseio.com/products/$id.json?auth=$authToken";
     final currentProductIndex =
         _items.indexWhere((product) => product.id == id);
     var currentProduct = _items[currentProductIndex];

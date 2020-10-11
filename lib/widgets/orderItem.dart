@@ -40,7 +40,7 @@ class _OrderItemState extends State<OrderItem> {
           ),
           if (_expanded)
             Container(
-              height: min(150.0, widget.order.products.length * 25.0 + 10.0),
+              height: min(200.0, widget.order.products.length * 30.0 + 10.0),
               child: ListView(
                 children: widget.order.products
                     .map(
@@ -59,7 +59,7 @@ class _OrderItemState extends State<OrderItem> {
                                     .textTheme
                                     .bodyText1
                                     .toString(),
-                                fontSize: 24,
+                                fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 fontStyle: FontStyle.italic,
                               ),

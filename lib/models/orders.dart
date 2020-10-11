@@ -21,13 +21,18 @@ class OrderItems {
 
 class Orders with ChangeNotifier {
   List<OrderItems> _orders = [];
+  final String authToken;
+  final String userId;
+
+  Orders(this.authToken, this.userId, this._orders);
 
   List<OrderItems> get orders {
     return [..._orders];
   }
 
   Future<void> fetchOrders() async {
-    const url = "https://shopping-app-f0bc8.firebaseio.com/orders.json";
+    final url =
+        "https://shopping-app-f0bc8.firebaseio.com/orders/$userId.json?auth=$authToken";
     final response = await http.get(url);
     final List<OrderItems> loadedOrders = [];
     final extractedData = json.decode(response.body) as Map<String, dynamic>;
@@ -67,22 +72,24 @@ class Orders with ChangeNotifier {
   }
 
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
-    const url = "https://shopping-app-f0bc8.firebaseio.com/orders.json";
+    final url =
+        "https://shopping-app-f0bc8.firebaseio.com/orders/$userId.json?auth=$authToken";
     final dateTimeStamp = DateTime.now();
     final response = await http.post(
       url,
       body: json.encode(
         {
-          "products": [
-            cartProducts
-                .map((product) => {
-                      "id": product.id,
-                      "title": product.title,
-                      "price": product.price,
-                      "quantity": product.quantity,
-                    })
-                .toList(),
-          ],
+          "products": cartProducts
+              .map(
+                (product) => {
+                  "id": product.id,
+                  "title": product.title,
+                  "price": product.price,
+                  "quantity": product.quantity,
+                },
+              )
+              .toList(),
+
           "totalAmount": total,
           "orderDate": dateTimeStamp.toIso8601String(),
           // '.toIso8601String()' converts the DateTime object to a string that is easily understandable and can be easily reconverted to a DateTime object.

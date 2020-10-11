@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/productDetailsScreen.dart';
 import '../models/products.dart';
 import '../models/cart.dart';
+import '../models/auth.dart';
 
 class ProductItem extends StatelessWidget {
   final String id;
@@ -20,6 +21,7 @@ class ProductItem extends StatelessWidget {
     /* Reference: https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple */
 
     final cart = Provider.of<Cart>(context, listen: false);
+    final auth = Provider.of<Auth>(context, listen: false);
 
     return Consumer<Product>(
       // Consumer only rebuilds the widgets that are part of its builder,
@@ -79,7 +81,10 @@ class ProductItem extends StatelessWidget {
                       color: Colors.pink[400],
                     )
                   : Icon(Icons.favorite_border),
-              onPressed: product.toggleFavourite,
+              onPressed: () => product.toggleFavourite(
+                auth.token,
+                auth.userId,
+              ),
             ),
             trailing: IconButton(
               icon: Icon(Icons.add_shopping_cart),
