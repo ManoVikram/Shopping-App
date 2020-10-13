@@ -45,11 +45,29 @@ class ProductItem extends StatelessWidget {
                 // arguments: id,
               );
             },
-            child: Image.network(
+            /* child: Image.network(
               // imageURL,
               product.imageURL,
               fit: BoxFit.fitHeight,
               width: double.infinity,
+            ), */
+            child: Hero(
+              // 'Hero()' widget expands the image on the products grid page
+              // to the image on the product detail page.
+              // Works properly only while switching screens.
+              tag: product.id,
+              // 'tag:' value must be same on both the screens.
+              // i.e.) On both products grid screen and products detail screen.
+              child: FadeInImage(
+                placeholder: AssetImage(
+                  "lib/assets/images/NoImageAvailable.png",
+                ),
+                image: NetworkImage(
+                  product.imageURL,
+                ),
+                fit: BoxFit.cover,
+                // 'AssetImage' fades out and 'NetworkImage' fades in.
+              ),
             ),
           ),
           /* footer: Container(

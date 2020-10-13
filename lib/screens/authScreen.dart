@@ -102,7 +102,8 @@ class AuthCard extends StatefulWidget {
   _AuthCardState createState() => _AuthCardState();
 }
 
-class _AuthCardState extends State<AuthCard> {
+class _AuthCardState extends State<AuthCard>
+    with SingleTickerProviderStateMixin {
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -111,6 +112,75 @@ class _AuthCardState extends State<AuthCard> {
   };
   var _isLoading = false;
   final _passwordController = TextEditingController();
+  AnimationController _controller;
+  // 'AnimationController' helps in starting and controlling the animation.
+  Animation<Size> _heightAnimation;
+  // 'Animation' is a generic class
+  // Both 'Animation' and 'Size' are classes provided by Flutter.
+  // Manages the heavy lifting of managing the height.
+  Animation<double> _opacityAnimation;
+  Animation<Offset> _slideAnimation;
+
+  /* Flutter updates the screen 60 times per second. */
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    _controller = AnimationController(
+      vsync: this,
+      duration: Duration(
+        milliseconds: 300,
+      ),
+    );
+    // 'vsync' - Holds the pointer to the widget that needs to be animated
+    // and it is visible on the screen.
+    // Needs 'SingleTickerProviderStateMixin' mixin to work. Provided by 'material.dart'.
+
+    _heightAnimation = Tween(
+      begin: Size(double.infinity, 260),
+      end: Size(double.infinity, 320),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.linear,
+        // 'curve:' argument defines how the animation needs to be changed from begin to end.
+        // Here, the animation changes linearly.
+      ),
+    );
+    // 'Tween()' has the information on how to animate between 2 values.
+    // '.animate()' helps in animating it.
+
+    /* _heightAnimation.addListener(() => setState(() {})); */
+    // setState() needs to be called when the screen is updated.
+    // 'AnimatedBuilder()' is used to avoid setting up listeners manually.
+
+    _opacityAnimation = Tween(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticInOut,
+      ),
+    );
+
+    _slideAnimation = Tween<Offset>(
+      begin: Offset(0, -1.5),
+      end: Offset(0, 0),
+    ).animate(
+      CurvedAnimation(
+        parent: _controller,
+        curve: Curves.elasticInOut,
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    _controller.dispose();
+    // Controller and Listener are disposed.
+  }
 
   void _showErrorDialog(String message) {
     // 'context' is available everywhere in the State class.
@@ -193,10 +263,13 @@ class _AuthCardState extends State<AuthCard> {
       setState(() {
         _authMode = AuthMode.SignUp;
       });
+      _controller.forward(); // Starts the animation.
     } else {
       setState(() {
         _authMode = AuthMode.Login;
       });
+      _controller
+          .reverse(); // Animation is played in the reverse mode when the mode changes.
     }
   }
 
@@ -208,7 +281,27 @@ class _AuthCardState extends State<AuthCard> {
         borderRadius: BorderRadius.circular(10),
       ),
       elevation: 10,
-      child: Container(
+      child:
+          /* AnimatedBuilder(
+        animation: _heightAnimation,
+        builder: (contxt, childArg) => Container(
+          // height: _authMode == AuthMode.SignUp ? 320 : 260,
+          height: _heightAnimation.value.height,
+          // constraints: BoxConstraints(
+          //   minHeight: _authMode == AuthMode.SignUp ? 320 : 260,
+          constraints: BoxConstraints(
+            minHeight: _heightAnimation.value.height,
+          ),
+          width: deviceSize.width * 0.75,
+          padding: EdgeInsets.all(16),
+          child: childArg,
+        ), */
+          // 'child' argument of builder method will not be re-built. - "child: Form(...)"
+          AnimatedContainer(
+        duration: Duration(
+          milliseconds: 300,
+        ),
+        curve: Curves.easeIn,
         height: _authMode == AuthMode.SignUp ? 320 : 260,
         constraints: BoxConstraints(
           minHeight: _authMode == AuthMode.SignUp ? 320 : 260,
@@ -252,19 +345,41 @@ class _AuthCardState extends State<AuthCard> {
                     _authData["password"] = value;
                   },
                 ),
-                if (_authMode == AuthMode.SignUp)
-                  TextFormField(
-                    enabled: _authMode == AuthMode.SignUp,
-                    decoration: InputDecoration(labelText: "Confirm Password"),
-                    obscureText: true, // Input is masked(not shown to the user)
-                    validator: _authMode == AuthMode.SignUp
-                        ? (value) {
-                            if (value != _passwordController.text) {
-                              return "Passwords didn't match.";
-                            }
-                          }
-                        : null,
+                // if (_authMode == AuthMode.SignUp)
+                /* 
+                More animation = Less speed 
+                Animation and Speed are inversely proportional to each other.
+                */
+                AnimatedContainer(
+                  constraints: BoxConstraints(
+                    minHeight: _authMode == AuthMode.SignUp ? 60 : 0,
+                    maxHeight: _authMode == AuthMode.SignUp ? 120 : 0,
                   ),
+                  duration: Duration(
+                    milliseconds: 300,
+                  ),
+                  curve: Curves.linear,
+                  child: FadeTransition(
+                    opacity: _opacityAnimation,
+                    child: SlideTransition(
+                      position: _slideAnimation,
+                      child: TextFormField(
+                        enabled: _authMode == AuthMode.SignUp,
+                        decoration:
+                            InputDecoration(labelText: "Confirm Password"),
+                        obscureText:
+                            true, // Input is masked(not shown to the user)
+                        validator: _authMode == AuthMode.SignUp
+                            ? (value) {
+                                if (value != _passwordController.text) {
+                                  return "Passwords didn't match.";
+                                }
+                              }
+                            : null,
+                      ),
+                    ),
+                  ),
+                ),
                 SizedBox(
                   height: 10,
                 ),
