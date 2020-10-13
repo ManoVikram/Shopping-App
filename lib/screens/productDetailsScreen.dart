@@ -25,7 +25,7 @@ class ProductDetails extends StatelessWidget {
       productId,
     );
     return Scaffold(
-      appBar: AppBar(
+      /* appBar: AppBar(
         title: Text(
           loadedProduct.title,
           style: TextStyle(
@@ -33,19 +33,101 @@ class ProductDetails extends StatelessWidget {
             letterSpacing: 2,
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
+      ), */
+      body: CustomScrollView(
+        // 'slivers' - Parts of the screen that can scroll.
+        slivers: [
+          // 'SliverAppBar()' dynamically changes into an AppBar
+          SliverAppBar(
+            expandedHeight: 300,
+            // Actually, represents the height of the image.
+            pinned: true,
+            // 'AppBar' sticks to the top when scrolled.
+            flexibleSpace: FlexibleSpaceBar(
+              /* title: Text(
+                loadedProduct.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: 2,
+                ),
+              ), */
+              background: Hero(
+                tag: loadedProduct.id,
+                // 'tag:' value should be same on both the screens.
+                // Here, in 'productDetailsScreen.dart' and 'productItem.dart'
+                child: Image.network(
+                  loadedProduct.imageURL,
+                  fit: BoxFit.cover,
+                ),
+              ),
+            ),
+          ),
+          // 'SliverList()' is a kind of list view with slivers(multiple scrollable things on the screen).
+          SliverList(
+            delegate: SliverChildListDelegate(
+              [
+                SizedBox(
+                  height: 10,
+                ),
+                Chip(
+                  elevation: 5,
+                  label: Text(
+                    "₹${loadedProduct.price}",
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.bodyText1.toStringShort(),
+                      color: Colors.blueGrey[600],
+                      shadows: [
+                        /* Shadow(
+                      offset: Offset(5, 5),
+                      blurRadius: 5,
+                      color: Colors.black87,
+                    ), */
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  backgroundColor: Colors.white,
+                ),
+                SizedBox(
+                  height: 10,
+                ),
+                Container(
+                  child: Text(
+                    loadedProduct.description,
+                    style: TextStyle(
+                      fontFamily:
+                          Theme.of(context).textTheme.bodyText1.toString(),
+                      letterSpacing: 3,
+                      fontWeight: FontWeight.w600,
+                    ),
+                    textAlign: TextAlign.justify,
+                  ),
+                ),
+                SizedBox(
+                  height: 1000,
+                ),
+              ],
+            ),
+          ),
+        ],
+        /* body: SingleChildScrollView(
+         child: Column(
           children: [
             Container(
               height: 300,
               width: double.infinity,
-              child: Image.network(
-                loadedProduct.imageURL,
-                fit: BoxFit.cover,
-              ),
+              child: /* Hero(
+                tag: loadedProduct.id,
+                // 'tag:' value should be same on both the screens.
+                // Here, in 'productDetailsScreen.dart' and 'productItem.dart'
+                child: Image.network(
+                  loadedProduct.imageURL,
+                  fit: BoxFit.cover,
+                ),
+              ), */ // Used inside SliverAppBar()
             ),
-            SizedBox(
+            /* SizedBox(
               height: 10,
             ),
             Chip(
@@ -67,8 +149,8 @@ class ProductDetails extends StatelessWidget {
                 textAlign: TextAlign.center,
               ),
               backgroundColor: Colors.white,
-            ),
-            SizedBox(
+            ), */ // Used in SliverList()
+            /* SizedBox(
               height: 10,
             ),
             Container(
@@ -81,9 +163,9 @@ class ProductDetails extends StatelessWidget {
                 ),
                 textAlign: TextAlign.justify,
               ),
-            ),
+            ), */ // Used inside SliverList()
           ],
-        ),
+        ), */
       ),
     );
   }
