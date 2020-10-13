@@ -34,7 +34,7 @@ class Auth with ChangeNotifier {
   Future<void> _authenticate(
       String email, String password, String urlSegment) async {
     final url =
-        "https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=AIzaSyBswHNLkOkr3LCp_ZAI2o0v8CgYmZ0Z7u0";
+        "https://identitytoolkit.googleapis.com/v1/accounts:$urlSegment?key=[API_KEY]";
     // [API_KEY] - Steps - Gear icon -> Project Settings -> Web API key
     try {
       // Validation errors aren't thrown by 'post'
