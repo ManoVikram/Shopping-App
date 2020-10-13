@@ -165,7 +165,7 @@ class _AuthCardState extends State<AuthCard>
     );
 
     _slideAnimation = Tween<Offset>(
-      begin: Offset(0, -1.5),
+      begin: Offset(0, 0),
       end: Offset(0, 0),
     ).animate(
       CurvedAnimation(
@@ -299,7 +299,7 @@ class _AuthCardState extends State<AuthCard>
           // 'child' argument of builder method will not be re-built. - "child: Form(...)"
           AnimatedContainer(
         duration: Duration(
-          milliseconds: 300,
+          milliseconds: 400,
         ),
         curve: Curves.easeIn,
         height: _authMode == AuthMode.SignUp ? 320 : 260,
@@ -356,9 +356,9 @@ class _AuthCardState extends State<AuthCard>
                     maxHeight: _authMode == AuthMode.SignUp ? 120 : 0,
                   ),
                   duration: Duration(
-                    milliseconds: 300,
+                    milliseconds: 400,
                   ),
-                  curve: Curves.linear,
+                  curve: Curves.easeIn,
                   child: FadeTransition(
                     opacity: _opacityAnimation,
                     child: SlideTransition(

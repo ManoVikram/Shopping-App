@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../screens/ordersScreen.dart';
 import '../screens/userProductsScreen.dart';
 import '../models/auth.dart';
+import '../helpers/customRouteTransition.dart';
 
 class AppDrawer extends StatelessWidget {
   @override
@@ -47,6 +48,12 @@ class AppDrawer extends StatelessWidget {
             onTap: () {
               Navigator.of(context)
                   .pushReplacementNamed(OrdersScreen.routeName);
+              /* Navigator.of(context).pushReplacement(
+                CustomRouteTransition(
+                  builder: (contxt) => OrdersScreen(),
+                ),
+              );
+              // Custom animation is used only when moved to Orders screen. */
             },
           ),
           Divider(),

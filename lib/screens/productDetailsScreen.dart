@@ -44,13 +44,15 @@ class ProductDetails extends StatelessWidget {
             pinned: true,
             // 'AppBar' sticks to the top when scrolled.
             flexibleSpace: FlexibleSpaceBar(
-              /* title: Text(
+              // centerTitle: true,
+              title: Text(
                 loadedProduct.title,
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   letterSpacing: 2,
                 ),
-              ), */
+                // textAlign: TextAlign.center,
+              ),
               background: Hero(
                 tag: loadedProduct.id,
                 // 'tag:' value should be same on both the screens.
@@ -89,23 +91,35 @@ class ProductDetails extends StatelessWidget {
                   ),
                   backgroundColor: Colors.white,
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                Container(
-                  child: Text(
-                    loadedProduct.description,
-                    style: TextStyle(
-                      fontFamily:
-                          Theme.of(context).textTheme.bodyText1.toString(),
-                      letterSpacing: 3,
-                      fontWeight: FontWeight.w600,
+                Column(
+                  // Column() isn't actually necessary.
+                  // Here, Column() is used to align things to center(especially product description).
+                  children: [
+                    SizedBox(
+                      height: 10,
                     ),
-                    textAlign: TextAlign.justify,
-                  ),
-                ),
-                SizedBox(
-                  height: 1000,
+                    Container(
+                      // width: double.infinity,
+                      padding: EdgeInsets.only(
+                        left: 15,
+                        right: 15,
+                      ),
+                      child: Text(
+                        loadedProduct.description,
+                        style: TextStyle(
+                          fontFamily:
+                              Theme.of(context).textTheme.bodyText1.toString(),
+                          letterSpacing: 3,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        textAlign: TextAlign.justify,
+                      ),
+                    ),
+                    SizedBox(
+                      height: 1000,
+                    ),
+                  ],
                 ),
               ],
             ),

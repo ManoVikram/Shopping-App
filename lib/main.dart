@@ -13,6 +13,7 @@ import './providers/productsProvider.dart';
 import './models/cart.dart';
 import './models/orders.dart';
 import './models/auth.dart';
+import './helpers/customRouteTransition.dart';
 
 class MyApp extends StatelessWidget {
   @override
@@ -71,6 +72,13 @@ class MyApp extends StatelessWidget {
                   color: Colors.white,
                 ),
               ),
+          // 'pageTransitionsTheme' is used to apply custom page transition to all the screens.
+          pageTransitionsTheme: PageTransitionsTheme(
+            builders: {
+              TargetPlatform.android: CustomPageRouteTransitionBuilder(),
+              TargetPlatform.iOS: CustomPageRouteTransitionBuilder(),
+            },
+          ),
         ),
         home: ShoppingApp(),
         routes: {
